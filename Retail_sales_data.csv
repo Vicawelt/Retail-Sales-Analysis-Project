@@ -1,1 +1,82 @@
+from pathlib import Path
+base = Path("/mnt/data/retail_sales_inventory_analysis_portfolio")
+base.mkdir(parents=True, exist_ok=True)
+
+files = {
+"retail_sales_data.csv": """Order_ID,Order_Date,Product_Category,Product,Region,Units_Sold,Unit_Price,Inventory_Beginning,Inventory_Ending
+1001,2026-01-03,Electronics,Wireless Mouse,Lagos,12,8500,80,68
+1002,2026-01-04,Electronics,Keyboard,Lagos,8,12000,60,52
+1003,2026-01-05,Office Supplies,Notebook,Abuja,25,2500,120,95
+1004,2026-01-06,Office Supplies,Pen Pack,Port Harcourt,30,1800,150,120
+1005,2026-01-08,Electronics,USB Hub,Lagos,10,6500,70,60
+1006,2026-01-10,Furniture,Office Chair,Abuja,5,85000,30,25
+1007,2026-01-12,Electronics,Wireless Mouse,Port Harcourt,15,8500,75,60
+1008,2026-01-14,Office Supplies,Notebook,Lagos,20,2500,100,80
+1009,2026-01-16,Furniture,Office Chair,Lagos,4,85000,25,21
+1010,2026-01-18,Electronics,Keyboard,Abuja,7,12000,50,43
+""",
+"analysis_queries.sql": """-- Retail Sales & Inventory Analysis
+SELECT Product_Category, SUM(Units_Sold * Unit_Price) AS Revenue
+FROM retail_sales
+GROUP BY Product_Category
+ORDER BY Revenue DESC;
+
+SELECT Region, SUM(Units_Sold) AS Units_Sold,
+       SUM(Units_Sold * Unit_Price) AS Revenue
+FROM retail_sales
+GROUP BY Region
+ORDER BY Revenue DESC;
+
+SELECT Product, SUM(Units_Sold) AS Units_Sold
+FROM retail_sales
+GROUP BY Product
+ORDER BY Units_Sold DESC;
+""",
+"analysis.py": """import pandas as pd
+
+df = pd.read_csv("retail_sales_data.csv", parse_dates=["Order_Date"])
+df["Revenue"] = df["Units_Sold"] * df["Unit_Price"]
+
+print("Revenue by category:")
+print(df.groupby("Product_Category")["Revenue"].sum().sort_values(ascending=False))
+
+print("\\nRevenue by region:")
+print(df.groupby("Region")["Revenue"].sum().sort_values(ascending=False))
+
+print("\\nTop products by units sold:")
+print(df.groupby("Product")["Units_Sold"].sum().sort_values(ascending=False))
+""",
+"README.md": """# Retail Sales & Inventory Analysis Dashboard
+
+A portfolio project demonstrating practical data analysis using SQL, Python/Pandas, and Tableau.
+
+## Objective
+Analyze retail sales performance and inventory movement to identify revenue trends, regional performance, and high-volume products.
+
+## Tools
+- SQL
+- Python / Pandas
+- Tableau
+
+## Files
+- `retail_sales_data.csv` — sample sales and inventory dataset
+- `analysis_queries.sql` — SQL analysis queries
+- `analysis.py` — Python/Pandas analysis
+- `README.md` — project documentation
+
+## Suggested Tableau Dashboard
+1. KPI cards: Total Revenue, Units Sold, Average Order Value
+2. Revenue by Product Category
+3. Revenue by Region
+4. Top Products by Units Sold
+5. Inventory movement by product/category
+
+## Portfolio Use
+This project can be uploaded to GitHub and linked from the LinkedIn Featured section.
+"""
+}
+for name, content in files.items():
+    path = base / name
+    path.write_text(content, encoding="utf-8")
+    print(path)
 
